@@ -2,152 +2,302 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mijn Ledstrip</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#090a0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Mijn strip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
 <style>
-  :root { --bg:#0d0f14; --card:#171a22; --line:#262b37; --fg:#e8eaf0; --mut:#8b92a5; --acc:#7c5cff; }
-  * { box-sizing:border-box; }
-  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.4 system-ui,-apple-system,Segoe UI,sans-serif; }
-  .wrap { max-width:560px; margin:0 auto; padding:20px 16px 60px; }
-  header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
-  h1 { font-size:20px; margin:0; }
-  .dot { width:10px; height:10px; border-radius:50%; background:#555; display:inline-block; margin-right:8px; }
-  .dot.on { background:#3ddc84; }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:14px; }
-  .card h2 { font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--mut); margin:0 0 12px; font-weight:600; }
-  button { background:#232838; color:var(--fg); border:1px solid var(--line); border-radius:10px; padding:10px 14px; font:inherit; cursor:pointer; }
-  button:hover { background:#2b3146; }
-  button.primary { background:var(--acc); border-color:var(--acc); font-weight:600; }
-  button.primary:hover { background:#8f73ff; }
-  button.active { outline:2px solid var(--acc); }
-  button:disabled { opacity:.4; cursor:not-allowed; }
-  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-  .row > * { flex:0 0 auto; }
-  label.sl { display:flex; align-items:center; gap:12px; margin-top:12px; color:var(--mut); }
-  label.sl span:first-child { width:90px; }
-  label.sl input { flex:1; accent-color:var(--acc); }
-  input[type=color] { width:64px; height:44px; border:none; background:none; padding:0; cursor:pointer; }
-  .swatches button { width:40px; height:40px; border-radius:50%; padding:0; border:2px solid var(--line); }
-  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
-  .scenes { display:flex; flex-direction:column; gap:8px; margin-top:10px; }
-  .scene { display:flex; gap:8px; align-items:center; }
-  .scene .chip { width:22px; height:22px; border-radius:6px; border:1px solid var(--line); }
-  .scene button:nth-child(2) { flex:1; text-align:left; }
-  .mut { color:var(--mut); font-size:13px; }
-  .bar { height:8px; background:#232838; border-radius:6px; overflow:hidden; margin-top:10px; }
-  .bar > div { height:100%; width:0; background:var(--acc); transition:width .05s; }
-  #warn { background:#3a1d22; border:1px solid #6b2c36; color:#ffb4bf; border-radius:10px; padding:12px; margin-bottom:14px; display:none; }
-  input[type=text] { background:#0d0f14; color:var(--fg); border:1px solid var(--line); border-radius:10px; padding:10px 12px; font:inherit; flex:1; min-width:0; }
+  :root {
+    --bg:#090a0f; --surface:#12141d; --raised:#1a1d29; --line:#1f2230; --ink:#eef0f6; --mute:#747b91;
+    --glow-rgb:255,61,110; --glow-a:.6; --glow:rgb(var(--glow-rgb));
+    --font:"Bricolage Grotesque", ui-rounded, system-ui, -apple-system, sans-serif;
+    --tabh:68px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.4}
+  body{min-height:100vh;padding-bottom:calc(var(--tabh) + env(safe-area-inset-bottom) + 24px);overflow-x:hidden}
+  body::before{ /* de gloed van de strip */
+    content:"";position:fixed;inset:0 0 auto 0;height:62vh;pointer-events:none;z-index:0;
+    background:radial-gradient(90% 100% at 50% -20%, rgba(var(--glow-rgb), calc(var(--glow-a) * .42)), transparent 70%);
+    transition:background .15s linear;
+  }
+  #lightbar{position:fixed;top:0;left:0;right:0;height:3px;background:var(--glow);z-index:5;
+    box-shadow:0 0 28px 6px rgba(var(--glow-rgb), calc(var(--glow-a) * .9));opacity:calc(.25 + var(--glow-a) * .75)}
+  .wrap{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 22px) 20px 0}
+
+  /* kop */
+  header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+  h1{margin:0;font-size:34px;line-height:1;font-weight:800;letter-spacing:-.03em;font-variation-settings:"opsz" 96}
+  #conn{margin-top:8px;display:inline-flex;align-items:center;gap:8px;background:none;border:0;color:var(--mute);font:inherit;font-size:14px;padding:4px 0;cursor:pointer}
+  #conn .dot{width:8px;height:8px;border-radius:50%;background:#4a4f62}
+  #conn.on .dot{background:#41e08a;box-shadow:0 0 10px #41e08a}
+  #conn.on{color:var(--ink)}
+  #power{width:54px;height:54px;border-radius:50%;border:1.5px solid rgba(255,255,255,.14);background:rgba(18,20,29,.7);
+    color:var(--ink);display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(8px);flex:none}
+  #power.lit{border-color:var(--glow);box-shadow:0 0 22px rgba(var(--glow-rgb),.5), inset 0 0 12px rgba(var(--glow-rgb),.25);color:var(--glow)}
+  #power svg{width:24px;height:24px}
+
+  /* tekst-hulpjes */
+  .lbl{color:var(--mute);font-size:14px}
+  .big{font-size:20px;font-weight:700;letter-spacing:-.01em;margin:0}
+  button{font-family:inherit}
+  #log{display:none;white-space:pre-wrap;font:12px/1.5 ui-monospace,Menlo,monospace;color:var(--mute);background:var(--surface);border-radius:12px;padding:12px;margin:16px 0 0}
+  #warn{display:none;background:#2a1519;color:#ffb4bf;border-radius:12px;padding:12px 14px;margin-top:16px;font-size:14px}
+
+  .panel{display:none;padding-top:26px}
+  .panel.show{display:block;animation:in .22s ease-out}
+  @keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.panel.show{animation:none}}
+
+  /* kleurenwiel */
+  #wheelBox{display:grid;place-items:center;padding:6px 0 4px}
+  #wheel{position:relative;width:min(78vw,300px);aspect-ratio:1;border-radius:50%;touch-action:none;cursor:crosshair;
+    background:radial-gradient(circle closest-side,#fff 0%,rgba(255,255,255,0) 100%),
+               conic-gradient(#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00);
+    box-shadow:0 0 0 1px rgba(255,255,255,.08), 0 22px 60px -18px rgba(var(--glow-rgb),.75)}
+  #wheel::after{content:"";position:absolute;inset:0;border-radius:50%;background:rgba(9,10,15,calc(1 - var(--bri,1)*.88));pointer-events:none;mix-blend-mode:multiply}
+  #knob{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:3px solid #fff;background:var(--glow);
+    box-shadow:0 2px 12px rgba(0,0,0,.55);pointer-events:none;z-index:2}
+
+  /* schuifregelaars */
+  .field{margin-top:28px}
+  .field .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+  .field output{font-variant-numeric:tabular-nums;font-weight:700}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:34px;background:transparent;margin:0}
+  input[type=range]::-webkit-slider-runnable-track{height:34px;border-radius:17px;background:var(--track,var(--raised))}
+  input[type=range]::-moz-range-track{height:34px;border-radius:17px;background:var(--track,var(--raised))}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:34px;height:34px;border-radius:50%;background:#fff;border:0;box-shadow:0 1px 8px rgba(0,0,0,.5)}
+  input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;background:#fff;border:0}
+  #bri{--track:linear-gradient(90deg,#14161f,var(--glow))}
+  #temp{--track:linear-gradient(90deg,#ff9329,#fff,#c8dcff)}
+  .plain{--track:var(--raised)}
+
+  .swatches{display:flex;gap:12px;overflow-x:auto;padding:4px 20px 6px;margin:26px -20px 0;scrollbar-width:none}
+  .swatches::-webkit-scrollbar{display:none}
+  .swatches button{flex:none;width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,255,255,.12);cursor:pointer}
+
+  /* lijsten */
+  .list{display:flex;flex-direction:column;margin-top:8px}
+  .row{display:flex;align-items:center;gap:14px;padding:14px 4px;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ink);font-size:17px;font-weight:500;text-align:left;cursor:pointer;width:100%}
+  .row:last-child{border-bottom:0}
+  .row .chip{width:46px;height:28px;border-radius:14px;flex:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+  .row .name{flex:1}
+  .row small{color:var(--mute);font-size:13px;font-weight:400;display:block}
+  .row.active .name{color:var(--glow)}
+  .row.active::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--glow);box-shadow:0 0 12px var(--glow)}
+  .row .x{background:none;border:0;color:var(--mute);font-size:18px;padding:6px 8px;cursor:pointer}
+
+  .seg{display:flex;background:var(--surface);border-radius:14px;padding:4px;gap:4px}
+  .seg button{flex:1;border:0;background:none;color:var(--mute);padding:11px 6px;border-radius:11px;font-size:15px;font-weight:500;cursor:pointer}
+  .seg button.on{background:var(--raised);color:var(--ink);box-shadow:0 1px 0 rgba(255,255,255,.06) inset}
+
+  .btn{display:block;width:100%;border:0;border-radius:16px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;color:#0a0b10;background:var(--glow)}
+  .btn.ghost{background:var(--surface);color:var(--ink);font-weight:500}
+  .btn:disabled{opacity:.35}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .chips button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:10px 16px;font-size:15px;cursor:pointer}
+  .chips button.on{border-color:var(--glow);color:var(--glow)}
+
+  .mix{display:flex;gap:10px;align-items:center;margin-top:12px}
+  .mix input[type=color]{width:46px;height:46px;border:0;border-radius:50%;padding:0;background:none;cursor:pointer;overflow:hidden}
+  .mix input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+  .mix input[type=color]::-webkit-color-swatch{border:0;border-radius:50%}
+  .mix .mini{width:46px;height:46px;border-radius:50%;border:1.5px dashed #3a3f55;background:none;color:var(--mute);font-size:22px;cursor:pointer}
+
+  .meter{height:46px;display:flex;align-items:flex-end;gap:3px;margin:22px 0 6px}
+  .meter i{flex:1;background:var(--glow);border-radius:3px;height:4px;opacity:.9;transition:height .06s}
+  .section{margin-top:34px}
+  .section:first-child{margin-top:0}
+  .section h2{margin:0 0 4px;font-size:22px;font-weight:700;letter-spacing:-.02em}
+  .hint{color:var(--mute);font-size:14px;margin:6px 0 0}
+  input[type=text]{width:100%;background:var(--surface);border:1px solid var(--line);color:var(--ink);border-radius:14px;padding:15px;font:inherit;font-size:16px}
+  input[type=text]:focus{outline:2px solid var(--glow);outline-offset:1px;border-color:transparent}
+  .switch{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 0}
+  .switch input{appearance:none;-webkit-appearance:none;width:52px;height:32px;border-radius:16px;background:var(--raised);position:relative;cursor:pointer;flex:none;transition:background .15s}
+  .switch input::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;transition:transform .15s}
+  .switch input:checked{background:var(--glow)}
+  .switch input:checked::after{transform:translateX(20px)}
+
+  /* tabbalk */
+  nav{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;justify-content:center;
+    padding:8px 12px calc(env(safe-area-inset-bottom) + 8px);background:rgba(9,10,15,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--line)}
+  nav .inner{display:flex;width:100%;max-width:520px}
+  nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;color:var(--mute);font-size:12px;font-weight:500;padding:6px 0;cursor:pointer}
+  nav button svg{width:24px;height:24px}
+  nav button.on{color:var(--glow)}
+  #toast{position:fixed;left:50%;bottom:calc(var(--tabh) + env(safe-area-inset-bottom) + 18px);transform:translate(-50%,10px);z-index:20;background:var(--raised);color:var(--ink);padding:11px 18px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:.2s;max-width:90vw;text-align:center}
+  #toast.show{opacity:1;transform:translate(-50%,0)}
+  button:focus-visible{outline:2px solid var(--glow);outline-offset:2px}
 </style>
 </head>
 <body>
+<div id="lightbar"></div>
 <div class="wrap">
   <header>
-    <h1>💡 Mijn Ledstrip</h1>
-    <div class="row">
-      <span id="status" class="mut"><span class="dot" id="dot"></span><span id="statusTxt">Niet verbonden</span></span>
-      <button class="primary" id="btnConnect">Verbinden</button>
+    <div>
+      <h1>Mijn strip</h1>
+      <button id="conn"><span class="dot"></span><span id="connTxt">Niet verbonden. Tik om te verbinden</span></button>
     </div>
+    <button id="power" aria-label="Aan of uit" title="Aan of uit">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v8"/><path d="M6.4 6.6a8 8 0 1 0 11.2 0"/></svg>
+    </button>
   </header>
+  <div id="log"></div>
+  <div id="warn">Bluetooth werkt hier niet. Open deze pagina in Bluefy op je iPhone, of in Chrome of Edge op je laptop.</div>
 
-  <div id="log" class="mut" style="display:none;white-space:pre-wrap;font:12px/1.4 ui-monospace,Menlo,monospace;background:#0d0f14;border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:14px"></div>
-  <div id="warn">Web Bluetooth werkt alleen in Chrome of Edge (niet Safari of Firefox). Open dit bestand daar.</div>
-
-  <div class="card">
-    <h2>Basis</h2>
-    <div class="row">
-      <button id="btnOn">Aan</button>
-      <button id="btnOff">Uit</button>
-      <input type="color" id="color" value="#ff2d55" title="Kleur">
+  <!-- LICHT -->
+  <section class="panel show" id="p-licht">
+    <div id="wheelBox"><div id="wheel"><div id="knob"></div></div></div>
+    <div class="field">
+      <div class="top"><span class="lbl">Helderheid</span><output id="briVal">100%</output></div>
+      <input type="range" id="bri" min="1" max="100" value="100" aria-label="Helderheid">
     </div>
-    <label class="sl"><span>Helderheid</span><input type="range" id="bri" min="1" max="100" value="100"><span id="briVal">100%</span></label>
-    <div class="swatches row" id="swatches" style="margin-top:14px"></div>
-  </div>
-
-  <div class="card">
-    <h2>Effecten</h2>
-    <div class="grid" id="effects"></div>
-    <label class="sl"><span>Snelheid</span><input type="range" id="speed" min="1" max="100" value="40"><span id="speedVal">40</span></label>
-    <div class="row" style="margin-top:12px"><button id="btnStopFx">Stop effect</button></div>
-  </div>
-
-  <div class="card">
-    <h2>Muziek (microfoon)</h2>
-    <div class="row">
-      <button id="btnMic">🎤 Start muziekmodus</button>
+    <div class="field" style="margin-top:22px">
+      <div class="top"><span class="lbl">Wit, van warm naar koel</span></div>
+      <input type="range" id="temp" min="0" max="100" value="50" aria-label="Witte kleurtemperatuur">
     </div>
-    <label class="sl"><span>Gevoeligheid</span><input type="range" id="sens" min="1" max="100" value="60"></label>
-    <div class="bar"><div id="level"></div></div>
-    <p class="mut" style="margin:10px 0 0">Bas bepaalt de helderheid, de kleur wisselt mee op de beat.</p>
-  </div>
+    <div class="swatches" id="swatches"></div>
+  </section>
 
-  <div class="card">
-    <h2>Mijn scènes</h2>
-    <div class="row">
-      <input type="text" id="sceneName" placeholder="Naam van scène, bijv. Chill">
-      <button id="btnSaveScene">Opslaan</button>
+  <!-- EFFECTEN -->
+  <section class="panel" id="p-fx">
+    <div class="section">
+      <h2>Effecten</h2>
+      <div class="list" id="fxList"></div>
     </div>
-    <div class="scenes" id="scenes"></div>
-    <p class="mut" style="margin:10px 0 0">Slaat de huidige kleur en helderheid op.</p>
-  </div>
+    <div class="field">
+      <div class="top"><span class="lbl">Snelheid</span><output id="speedVal">40</output></div>
+      <input class="plain" type="range" id="speed" min="1" max="100" value="40" aria-label="Snelheid">
+    </div>
+    <div class="section">
+      <h2>Eigen mix</h2>
+      <p class="hint">Kies tot zes kleuren. Het effect "Eigen mix" gaat er vloeiend doorheen.</p>
+      <div class="mix" id="mix"></div>
+    </div>
+    <div class="section"><button class="btn ghost" id="stopFx">Terug naar vaste kleur</button></div>
+  </section>
 
-  <div class="card">
-    <h2>Timer</h2>
-    <div class="row">
-      <button data-timer="15">Uit over 15 min</button>
-      <button data-timer="30">30 min</button>
-      <button data-timer="60">60 min</button>
-      <button id="btnTimerCancel">Annuleer</button>
+  <!-- MUZIEK -->
+  <section class="panel" id="p-music">
+    <div class="section">
+      <h2>Muziek</h2>
+      <p class="hint">De strip reageert op het geluid dat je microfoon hoort. Laat muziek dus door een speaker lopen.</p>
     </div>
-    <p class="mut" id="timerTxt" style="margin:10px 0 0"></p>
-  </div>
+    <div class="meter" id="meter" aria-hidden="true"></div>
+    <div class="section" style="margin-top:20px">
+      <div class="seg" id="micMode">
+        <button data-m="pulse">Puls</button>
+        <button data-m="beat">Beat</button>
+        <button data-m="spectrum">Spectrum</button>
+      </div>
+      <p class="hint" id="micHint"></p>
+    </div>
+    <div class="field">
+      <div class="top"><span class="lbl">Gevoeligheid</span><output id="sensVal">60</output></div>
+      <input class="plain" type="range" id="sens" min="1" max="100" value="60" aria-label="Gevoeligheid">
+    </div>
+    <div class="section"><button class="btn" id="btnMic">Start muziekmodus</button></div>
+  </section>
+
+  <!-- TIJD -->
+  <section class="panel" id="p-time">
+    <div class="section">
+      <h2>Slaapfade</h2>
+      <p class="hint">De strip dimt langzaam tot uit.</p>
+      <div class="chips" id="sleepChips"></div>
+      <div style="margin-top:14px" class="lbl" id="sleepTxt"></div>
+      <div style="margin-top:14px"><button class="btn ghost" id="sleepCancel" style="display:none">Annuleer slaapfade</button></div>
+    </div>
+    <div class="section">
+      <h2>Zonsopgang</h2>
+      <p class="hint">De strip start donkerrood en loopt op naar warm daglicht. Handig als wekker.</p>
+      <div class="chips" id="sunChips"></div>
+    </div>
+    <div class="section">
+      <div class="switch"><div><div class="big" style="font-size:17px">Scherm aan houden</div><div class="hint" style="margin-top:2px">Nodig voor timers en effecten. Als je scherm uitgaat, stopt de pagina.</div></div><input type="checkbox" id="wake" aria-label="Scherm aan houden"></div>
+    </div>
+  </section>
+
+  <!-- SCENES -->
+  <section class="panel" id="p-scenes">
+    <div class="section">
+      <h2>Nieuwe scène</h2>
+      <p class="hint">Bewaart wat er nu draait: kleur, helderheid, effect of muziekmodus.</p>
+      <div style="margin-top:12px"><input type="text" id="sceneName" placeholder="Naam, bijvoorbeeld Chill" maxlength="24"></div>
+      <div style="margin-top:12px"><button class="btn" id="saveScene">Scène bewaren</button></div>
+    </div>
+    <div class="section">
+      <h2>Mijn scènes</h2>
+      <div class="list" id="sceneList"></div>
+      <p class="hint" id="sceneEmpty">Nog geen scènes. Stel je licht in en bewaar het hierboven.</p>
+    </div>
+  </section>
 </div>
 
+<nav><div class="inner" id="tabs">
+  <button data-tab="licht" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3"/></svg>Licht</button>
+  <button data-tab="fx"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 5 13.5h6L10 21l8-10.5h-6L13 3z"/></svg>Effecten</button>
+  <button data-tab="music"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10v4M8 6v12M12 3v18M16 8v8M20 11v2"/></svg>Muziek</button>
+  <button data-tab="time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7.5"/><path d="M12 9v4l2.5 2M9 3h6"/></svg>Tijd</button>
+  <button data-tab="scenes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8L3.5 9.7l5.9-.9L12 3.5z"/></svg>Scènes</button>
+</div></nav>
+<div id="toast"></div>
+
 <script>
-// ===== Protocol: ELK-BLEDOB / LotusLamp X (variant A) =====
-const SERVICE_UUID = 0xfff0;
+// ===== Protocol: ELK-BLEDOB / LotusLamp X =====
+const SERVICE_FULL = '0000fff0-0000-1000-8000-00805f9b34fb';
 const CHAR_UUID    = '0000fff3-0000-1000-8000-00805f9b34fb';
 const CMD_ON  = Uint8Array.from([0x7e,0x07,0x04,0xff,0x00,0x01,0x02,0x01,0xef]);
 const CMD_OFF = Uint8Array.from([0x7e,0x07,0x04,0x00,0x00,0x00,0x02,0x01,0xef]);
 const cmdColor = (r,g,b) => Uint8Array.from([0x7e,0x07,0x05,0x03,r,g,b,0x10,0xef]);
 
-// ===== State =====
+const $ = id => document.getElementById(id);
+const clamp = (v,a=0,b=255) => Math.max(a, Math.min(b, v));
+const lerp = (a,b,t) => a + (b-a)*t;
+const hexToRgb = h => ({r:parseInt(h.slice(1,3),16), g:parseInt(h.slice(3,5),16), b:parseInt(h.slice(5,7),16)});
+const rgbToHex = (r,g,b) => '#'+[r,g,b].map(v=>Math.round(clamp(v)).toString(16).padStart(2,'0')).join('');
+function hsv(h,s,v){ const f=(n,k=(n+h/60)%6)=>v-v*s*Math.max(Math.min(k,4-k,1),0); return {r:f(5)*255,g:f(3)*255,b:f(1)*255}; }
+function rgb2hsv(r,g,b){ r/=255;g/=255;b/=255; const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn; let h=0;
+  if(d){ if(mx===r)h=((g-b)/d)%6; else if(mx===g)h=(b-r)/d+2; else h=(r-g)/d+4; h*=60; if(h<0)h+=360; }
+  return {h, s: mx?d/mx:0, v:mx}; }
+const mixRGB = (a,b,t) => ({r:lerp(a.r,b.r,t), g:lerp(a.g,b.g,t), b:lerp(a.b,b.b,t)});
+
+// ===== Staat (wordt onthouden) =====
+const DEFAULTS = { base:{r:255,g:61,b:110}, bri:100, fx:'Regenboog', speed:40, mix:['#ff3d6e','#7c5cff','#00d4ff'], micMode:'pulse', sens:60, scenes:[] };
+let S = Object.assign({}, DEFAULTS);
+try { Object.assign(S, JSON.parse(localStorage.getItem('stripState') || '{}')); } catch {}
+const persist = () => { try { localStorage.setItem('stripState', JSON.stringify(S)); } catch {} };
+
+let mode = 'static';           // static | fx | music | sunrise
+let tickFn = null, powered = true;
 let device = null, characteristic = null;
 let busy = false, pending = null, lastSent = '';
-let base = {r:255, g:45, b:85};   // gekozen kleur
-let brightness = 100;             // 0-100, software gedimd
-let fx = null, fxTimer = null, fxT = 0;
-let micCtx = null, micStream = null, micRaf = null;
-let timerHandle = null, timerEnd = 0, timerTick = null;
+let sleep = null;              // {start, dur}
 
-const $ = id => document.getElementById(id);
-const hexToRgb = h => ({r:parseInt(h.slice(1,3),16), g:parseInt(h.slice(3,5),16), b:parseInt(h.slice(5,7),16)});
-const rgbToHex = (r,g,b) => '#'+[r,g,b].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
-function hsv(h,s,v){ // h 0-360, s,v 0-1
-  const f=(n,k=(n+h/60)%6)=>v-v*s*Math.max(Math.min(k,4-k,1),0);
-  return {r:f(5)*255, g:f(3)*255, b:f(1)*255};
-}
+// ===== Berichtjes =====
+let toastT;
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600); }
+function log(msg){ const el=$('log'); el.style.display='block'; el.textContent += msg+'\n'; console.log(msg); }
+const errStr = e => ((e&&e.name)||'Fout') + ': ' + ((e&&e.message) || '(geen melding)');
 
 if (!navigator.bluetooth) $('warn').style.display = 'block';
 
 // ===== Bluetooth =====
-function setStatus(on, txt){ $('dot').classList.toggle('on', on); $('statusTxt').textContent = txt; $('btnConnect').textContent = on ? 'Verbreek' : 'Verbinden'; }
-
-function log(msg){ const el=$('log'); el.style.display='block'; el.textContent += msg + '\n'; console.log(msg); }
-const errStr = e => (e && (e.name||'Fout')) + ': ' + ((e && e.message) || '(geen melding)');
-const SERVICE_FULL = '0000fff0-0000-1000-8000-00805f9b34fb';
+function setStatus(on, txt){ $('conn').classList.toggle('on', on); $('connTxt').textContent = txt; }
 
 async function pickDevice(){
-  // Eerst op naam filteren, en als dat niet lukt (sommige browsers) alle apparaten tonen.
   try {
     return await navigator.bluetooth.requestDevice({
-      filters: [{namePrefix:'ELK'}, {namePrefix:'MELK'}, {namePrefix:'LEDBLE'}],
-      optionalServices: [SERVICE_FULL]
+      filters:[{namePrefix:'ELK'},{namePrefix:'MELK'},{namePrefix:'LEDBLE'}], optionalServices:[SERVICE_FULL]
     });
   } catch (e) {
-    if (e && e.name === 'NotFoundError') throw e;       // gebruiker annuleerde
-    log('Filter-keuze mislukt (' + errStr(e) + '), probeer alle apparaten...');
-    return await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: [SERVICE_FULL] });
+    if (e && e.name === 'NotFoundError') throw e;
+    log('Filter mislukt ('+errStr(e)+'), probeer alle apparaten...');
+    return await navigator.bluetooth.requestDevice({acceptAllDevices:true, optionalServices:[SERVICE_FULL]});
   }
 }
 
@@ -157,197 +307,325 @@ async function connect(){
   try {
     log('1/4 Apparaat kiezen...');
     device = await pickDevice();
-    log('   gekozen: ' + (device.name || device.id));
-    device.addEventListener('gattserverdisconnected', () => { characteristic = null; stopFx(); stopMic(); setStatus(false,'Niet verbonden'); });
+    log('    gekozen: ' + (device.name || device.id));
+    device.addEventListener('gattserverdisconnected', () => { characteristic = null; stopAll(); setStatus(false,'Verbinding weg. Tik om opnieuw te verbinden'); });
     setStatus(false,'Verbinden...');
-
-    log('2/4 Verbinden met GATT...');
+    log('2/4 Verbinden...');
     let server;
-    for (let i=1; i<=3; i++) {
+    for (let i=1;i<=3;i++){
       try { server = await device.gatt.connect(); break; }
-      catch (e) { log('   poging ' + i + ' mislukt: ' + errStr(e)); if (i===3) throw e; await new Promise(r=>setTimeout(r,800)); }
+      catch(e){ log('    poging '+i+' mislukt: '+errStr(e)); if(i===3) throw e; await new Promise(r=>setTimeout(r,800)); }
     }
-
     log('3/4 Service zoeken...');
     let svc;
     try { svc = await server.getPrimaryService(SERVICE_FULL); }
-    catch (e) {
-      log('   fff0 niet gevonden (' + errStr(e) + '), alle services bekijken...');
-      const all = await server.getPrimaryServices();
-      log('   gevonden services: ' + all.map(x=>x.uuid).join(', '));
-      svc = all[0];
-    }
-
+    catch(e){ log('    fff0 niet gevonden, alle services bekijken'); const all = await server.getPrimaryServices(); log('    '+all.map(x=>x.uuid).join(', ')); svc = all[0]; }
     log('4/4 Characteristic zoeken...');
     try { characteristic = await svc.getCharacteristic(CHAR_UUID); }
-    catch (e) {
-      log('   fff3 niet gevonden (' + errStr(e) + '), zoek schrijfbare...');
-      const chars = await svc.getCharacteristics();
-      log('   characteristics: ' + chars.map(c=>c.uuid.slice(4,8)).join(', '));
-      characteristic = chars.find(c => c.properties.writeWithoutResponse || c.properties.write);
-      if (!characteristic) throw new Error('Geen schrijfbare characteristic');
-    }
-
-    setStatus(true, device.name || 'Verbonden');
-    log('Verbonden!');
-    setTimeout(() => { $('log').style.display = 'none'; }, 2500);
-    lastSent = '';
-    await write(CMD_ON);
-    applyColor();
+    catch(e){ const chars = await svc.getCharacteristics(); characteristic = chars.find(c=>c.properties.writeWithoutResponse||c.properties.write); if(!characteristic) throw new Error('Geen schrijfbare characteristic'); }
+    setStatus(true, 'Verbonden met ' + (device.name || 'strip'));
+    log('Verbonden.');
+    setTimeout(()=>{ $('log').style.display='none'; }, 1800);
+    lastSent=''; powered=true; await write(CMD_ON); enterMode();
   } catch (e) {
     characteristic = null;
-    log('FOUT: ' + errStr(e));
-    setStatus(false, e && e.name === 'NotFoundError' ? 'Geen apparaat gekozen' : 'Fout bij verbinden');
+    log('FOUT: '+errStr(e));
+    setStatus(false, e && e.name==='NotFoundError' ? 'Geen apparaat gekozen. Tik om te verbinden' : 'Verbinden mislukt. Tik om opnieuw te proberen');
   }
 }
 
 async function write(bytes){
   if (!characteristic) return;
-  try { await characteristic.writeValueWithoutResponse(bytes); }
-  catch(e){ console.warn('write fout', e); }
+  try { await characteristic.writeValueWithoutResponse(bytes); } catch(e){ console.warn('write', e); }
 }
 
-// "Laatste wint": bij snelle updates (effecten/muziek) slaan we oude frames over.
+// "Laatste wint": oude frames worden overgeslagen als de strip niet kan bijhouden.
 async function sendRGB(r,g,b){
-  r=Math.max(0,Math.min(255,Math.round(r))); g=Math.max(0,Math.min(255,Math.round(g))); b=Math.max(0,Math.min(255,Math.round(b)));
-  const key = r+','+g+','+b;
-  if (key === lastSent && !pending) return;
-  pending = [r,g,b];
+  r=Math.round(clamp(r)); g=Math.round(clamp(g)); b=Math.round(clamp(b));
+  paint(r,g,b);
+  const key=r+','+g+','+b;
+  if (key===lastSent && !pending) return;
+  pending=[r,g,b];
   if (busy) return;
-  busy = true;
-  while (pending) {
-    const [pr,pg,pb] = pending; pending = null;
-    lastSent = pr+','+pg+','+pb;
-    await write(cmdColor(pr,pg,pb));
-    await new Promise(res => setTimeout(res, 25));
-  }
-  busy = false;
+  busy=true;
+  while(pending){ const [pr,pg,pb]=pending; pending=null; lastSent=pr+','+pg+','+pb; await write(cmdColor(pr,pg,pb)); await new Promise(res=>setTimeout(res,25)); }
+  busy=false;
 }
 
-function dim(c, factor=1){ const k = (brightness/100)*factor; return [c.r*k, c.g*k, c.b*k]; }
-function applyColor(){ sendRGB(...dim(base)); }
+// De pagina kleurt mee met de strip
+function paint(r,g,b){
+  const m = Math.max(r,g,b,1), k = 255/m;
+  const root = document.documentElement.style;
+  root.setProperty('--glow-rgb', Math.round(r*k)+','+Math.round(g*k)+','+Math.round(b*k));
+  root.setProperty('--glow-a', (m/255).toFixed(2));
+}
 
-// ===== UI: basis =====
-$('btnConnect').onclick = connect;
-$('btnOn').onclick  = async () => { await write(CMD_ON); lastSent=''; applyColor(); };
-$('btnOff').onclick = async () => { stopFx(); stopMic(); await write(CMD_OFF); };
+function sleepMul(){ return sleep ? Math.max(0, 1 - (Date.now()-sleep.start)/sleep.dur) : 1; }
+// c = {r,g,b}; factor = extra dimming; helderheid en slaapfade worden hier toegepast
+function out(c, factor=1, useBri=true){
+  if (!powered) return;
+  const k = (useBri ? S.bri/100 : 1) * factor * sleepMul();
+  sendRGB(c.r*k, c.g*k, c.b*k);
+}
+const applyColor = () => out(S.base);
 
-$('color').oninput = e => { stopFx(); stopMic(); base = hexToRgb(e.target.value); applyColor(); };
-$('bri').oninput = e => { brightness = +e.target.value; $('briVal').textContent = brightness+'%'; if(!fx && !micRaf) applyColor(); };
+// ===== Hoofdlus =====
+let lastT = performance.now();
+setInterval(() => {
+  const now = performance.now(), dt = (now-lastT)/1000; lastT = now;
+  if (sleep && sleepMul() <= 0) { finishSleep(); return; }
+  if (tickFn) tickFn(dt); else if (sleep) applyColor();
+}, 45);
 
-const swatchColors = ['#ff0000','#ff6a00','#ffd400','#00ff55','#00e5ff','#0066ff','#8a2be2','#ff2dd1','#ffffff','#ffb46b'];
-swatchColors.forEach(c => {
-  const b = document.createElement('button'); b.style.background = c; b.title = c;
-  b.onclick = () => { stopFx(); stopMic(); base = hexToRgb(c); $('color').value = c; applyColor(); };
+function stopAll(){
+  tickFn = null; mode = 'static';
+  stopMic(true);
+  fxName = null; renderFx();
+}
+function enterMode(){
+  if (mode==='fx') startFx(S.fx); else if (mode==='music') startMic(); else { stopAll(); applyColor(); }
+}
+
+// ===== Aan / uit =====
+function updatePower(){ $('power').classList.toggle('lit', powered); }
+$('power').onclick = async () => {
+  if (!characteristic) { connect(); return; }
+  if (powered) { powered=false; const m=mode; stopAll(); mode=m; sleep=null; sleepUI(); await write(CMD_OFF); }
+  else { powered=true; lastSent=''; await write(CMD_ON); enterMode(); }
+  updatePower();
+};
+$('conn').onclick = connect;
+updatePower();
+
+// ===== Licht: wiel, helderheid, wit =====
+const wheel = $('wheel'), knob = $('knob');
+function placeKnob(){
+  const {h,s} = rgb2hsv(S.base.r,S.base.g,S.base.b);
+  const a = h*Math.PI/180;
+  knob.style.left = (50 + Math.sin(a)*s*50) + '%';
+  knob.style.top  = (50 - Math.cos(a)*s*50) + '%';
+  knob.style.background = rgbToHex(S.base.r,S.base.g,S.base.b);
+  wheel.style.setProperty('--bri', S.bri/100);
+}
+function wheelPick(e){
+  const r = wheel.getBoundingClientRect();
+  const dx = e.clientX - (r.left + r.width/2), dy = e.clientY - (r.top + r.height/2);
+  const R = r.width/2;
+  const hue = (Math.atan2(dx, -dy) * 180/Math.PI + 360) % 360;
+  const sat = Math.min(1, Math.hypot(dx,dy)/R);
+  S.base = hsv(hue, sat, 1);
+  if (mode!=='static' && mode!=='fx') stopAll();
+  if (mode==='static') applyColor();
+  placeKnob(); persist();
+}
+let dragging = false;
+wheel.addEventListener('pointerdown', e => { dragging=true; wheel.setPointerCapture(e.pointerId); wheelPick(e); });
+wheel.addEventListener('pointermove', e => { if (dragging) wheelPick(e); });
+['pointerup','pointercancel'].forEach(t => wheel.addEventListener(t, () => dragging=false));
+
+$('bri').oninput = e => { S.bri=+e.target.value; $('briVal').textContent=S.bri+'%'; wheel.style.setProperty('--bri', S.bri/100); if (mode==='static') applyColor(); persist(); };
+$('temp').oninput = e => {
+  const t = e.target.value/100;
+  const warm={r:255,g:147,b:41}, mid={r:255,g:255,b:255}, cool={r:200,g:220,b:255};
+  S.base = t<.5 ? mixRGB(warm,mid,t*2) : mixRGB(mid,cool,(t-.5)*2);
+  if (mode!=='static' && mode!=='fx') stopAll();
+  if (mode==='static') applyColor();
+  placeKnob(); persist();
+};
+['#ff2d3c','#ff7a00','#ffd21f','#35e06b','#10e0d0','#2f7bff','#8b3dff','#ff3dd0','#ffffff','#ffb46b'].forEach(c => {
+  const b=document.createElement('button'); b.style.background=c; b.setAttribute('aria-label','Kleur '+c);
+  b.onclick=()=>{ S.base=hexToRgb(c); stopAll(); placeKnob(); applyColor(); persist(); };
   $('swatches').appendChild(b);
 });
 
 // ===== Effecten =====
-const EFFECTS = {
-  'Regenboog': t => hsv((t*60)%360, 1, 1),
-  'Ademen':    t => { const k=(Math.sin(t*2)+1)/2; const c=base; return {r:c.r*k,g:c.g*k,b:c.b*k}; },
-  'Strobe':    t => (Math.floor(t*6)%2) ? base : {r:0,g:0,b:0},
-  'Vuur':      t => { const k=0.35+Math.random()*0.65; return {r:255*k, g:(60+Math.random()*50)*k, b:5*k}; },
-  'Party':     t => hsv(Math.floor(t*2)*47 % 360, 1, 1),
-  'Zonsondergang': t => { const k=(Math.sin(t*0.6)+1)/2; return {r:255, g:30+k*110, b:k*30}; },
+let fire=.7, flash=0;
+const FX = {
+  'Regenboog':    {grad:'linear-gradient(90deg,#f33,#fc3,#3d6,#3cf,#63f,#f3c)', f:t=>hsv((t*50)%360,1,1)},
+  'Ademen':       {grad:'linear-gradient(90deg,#000,var(--glow),#000)', f:t=>{ const k=.06+.94*(Math.sin(t*1.6)+1)/2; return {r:S.base.r*k,g:S.base.g*k,b:S.base.b*k}; }},
+  'Strobe':       {grad:'linear-gradient(90deg,#000 0 25%,#fff 25% 50%,#000 50% 75%,#fff 75%)', f:t=>(Math.floor(t*7)%2)?S.base:{r:0,g:0,b:0}},
+  'Vuur':         {grad:'linear-gradient(90deg,#400,#f50,#fa0)', f:()=>{ fire=fire*.72+Math.random()*.28; const k=.25+.75*fire; return {r:255*k,g:(55+Math.random()*35)*k,b:4*k}; }},
+  'Kaars':        {grad:'linear-gradient(90deg,#321,#c60,#fb5)', f:()=>{ fire=fire*.85+Math.random()*.15; const k=.55+.45*fire; return {r:255*k,g:105*k,b:18*k}; }},
+  'Onweer':       {grad:'linear-gradient(90deg,#102,#125,#fff)', f:()=>{ flash=Math.max(flash*.78, Math.random()<.025?1:0); return mixRGB({r:8,g:14,b:70},{r:255,g:255,b:255},flash); }},
+  'Aurora':       {grad:'linear-gradient(90deg,#0f8,#0bd,#85f)', f:t=>hsv(190+90*Math.sin(t*.25), .9, .55+.45*Math.sin(t*.55+1))},
+  'Party':        {grad:'linear-gradient(90deg,#f0a,#0ef,#fe0,#7f0)', f:t=>hsv(Math.floor(t*2)*47%360,1,1)},
+  'Politie':      {grad:'linear-gradient(90deg,#f00 0 50%,#00f 50%)', f:t=>(Math.floor(t*5)%2)?{r:255,g:0,b:0}:{r:0,g:20,b:255}},
+  'Zonsondergang':{grad:'linear-gradient(90deg,#f33,#f80,#fc4)', f:t=>{ const k=(Math.sin(t*.6)+1)/2; return {r:255,g:30+k*110,b:k*30}; }},
+  'Eigen mix':    {grad:()=>'linear-gradient(90deg,'+S.mix.join(',')+')', f:t=>{
+      const c=S.mix.map(hexToRgb), n=c.length; if(n<2) return c[0]||S.base;
+      const p=(t*.25)%n, i=Math.floor(p), fr=p-i, e=fr*fr*(3-2*fr);
+      return mixRGB(c[i], c[(i+1)%n], e); }},
 };
-Object.keys(EFFECTS).forEach(name => {
-  const b = document.createElement('button'); b.textContent = name; b.dataset.fx = name;
-  b.onclick = () => startFx(name);
-  $('effects').appendChild(b);
-});
-$('speed').oninput = e => $('speedVal').textContent = e.target.value;
-
-function startFx(name){
-  stopMic(); stopFx(); fx = name; fxT = 0;
-  document.querySelectorAll('#effects button').forEach(b => b.classList.toggle('active', b.dataset.fx === name));
-  let last = performance.now();
-  fxTimer = setInterval(() => {
-    const now = performance.now(); const dt = (now-last)/1000; last = now;
-    fxT += dt * (0.2 + $('speed').value/25);   // snelheid schaalt de tijd
-    const c = EFFECTS[name](fxT);
-    sendRGB(...dim(c));
-  }, 45);
-}
-function stopFx(){
-  if (fxTimer) clearInterval(fxTimer);
-  fxTimer = null; fx = null;
-  document.querySelectorAll('#effects button').forEach(b => b.classList.remove('active'));
-}
-$('btnStopFx').onclick = () => { stopFx(); applyColor(); };
-
-// ===== Muziekmodus =====
-async function startMic(){
-  if (!characteristic) { alert('Verbind eerst met de strip.'); return; }
-  stopFx();
-  try {
-    micStream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false, noiseSuppression:false, autoGainControl:false}});
-  } catch(e){ alert('Microfoon geweigerd: ' + e.message); return; }
-  micCtx = new (window.AudioContext||window.webkitAudioContext)();
-  const src = micCtx.createMediaStreamSource(micStream);
-  const an = micCtx.createAnalyser(); an.fftSize = 512; an.smoothingTimeConstant = 0.6;
-  src.connect(an);
-  const data = new Uint8Array(an.frequencyBinCount);
-  let hue = 0, avg = 0, smooth = 0, lastBeat = 0;
-  $('btnMic').textContent = '⏹ Stop muziekmodus';
-  const loop = () => {
-    an.getByteFrequencyData(data);
-    let bass = 0; for (let i=1;i<=6;i++) bass += data[i];
-    bass /= 6*255;                                   // 0-1
-    const gain = 0.5 + $('sens').value/40;           // gevoeligheid
-    const lvl = Math.min(1, bass*gain);
-    avg = avg*0.96 + lvl*0.04;
-    const now = performance.now();
-    if (lvl > avg*1.35 + 0.08 && now-lastBeat > 180) { hue = (hue + 55) % 360; lastBeat = now; }
-    smooth = Math.max(lvl, smooth*0.85);             // snelle attack, trage release
-    $('level').style.width = (smooth*100)+'%';
-    const c = hsv(hue, 1, 1);
-    sendRGB(...dim(c, Math.pow(smooth, 1.2)));
-    micRaf = requestAnimationFrame(loop);
-  };
-  loop();
-}
-function stopMic(){
-  if (micRaf) cancelAnimationFrame(micRaf); micRaf = null;
-  if (micStream) micStream.getTracks().forEach(t => t.stop()); micStream = null;
-  if (micCtx) micCtx.close(); micCtx = null;
-  $('btnMic').textContent = '🎤 Start muziekmodus';
-  $('level').style.width = '0';
-}
-$('btnMic').onclick = () => micRaf ? (stopMic(), applyColor()) : startMic();
-
-// ===== Scènes (localStorage) =====
-function loadScenes(){ try { return JSON.parse(localStorage.getItem('ledScenes')||'[]'); } catch { return []; } }
-function saveScenes(s){ try { localStorage.setItem('ledScenes', JSON.stringify(s)); } catch {} }
-function renderScenes(){
-  const box = $('scenes'); box.innerHTML = '';
-  loadScenes().forEach((s,i) => {
-    const row = document.createElement('div'); row.className = 'scene';
-    const chip = document.createElement('div'); chip.className = 'chip'; chip.style.background = rgbToHex(s.r,s.g,s.b);
-    const go = document.createElement('button'); go.textContent = `${s.name} (${s.bri}%)`;
-    go.onclick = () => { stopFx(); stopMic(); base={r:s.r,g:s.g,b:s.b}; brightness=s.bri; $('bri').value=s.bri; $('briVal').textContent=s.bri+'%'; $('color').value=rgbToHex(s.r,s.g,s.b); applyColor(); };
-    const del = document.createElement('button'); del.textContent = '✕';
-    del.onclick = () => { const a=loadScenes(); a.splice(i,1); saveScenes(a); renderScenes(); };
-    row.append(chip, go, del); box.appendChild(row);
+let fxName = null, fxT = 0;
+function renderFx(){
+  const box=$('fxList'); box.innerHTML='';
+  Object.keys(FX).forEach(name => {
+    const b=document.createElement('button'); b.className='row'+(fxName===name?' active':'');
+    const g = typeof FX[name].grad==='function' ? FX[name].grad() : FX[name].grad;
+    b.innerHTML='<span class="chip" style="background:'+g+'"></span><span class="name">'+name+'</span>';
+    b.onclick=()=>{ if(!characteristic){ toast('Verbind eerst met de strip'); } mode='fx'; powered=true; updatePower(); startFx(name); };
+    box.appendChild(b);
   });
 }
-$('btnSaveScene').onclick = () => {
-  const name = $('sceneName').value.trim() || 'Scène ' + (loadScenes().length+1);
-  const a = loadScenes(); a.push({name, r:base.r, g:base.g, b:base.b, bri:brightness}); saveScenes(a);
-  $('sceneName').value = ''; renderScenes();
-};
-renderScenes();
+function startFx(name){
+  stopMic(true); S.fx=name; fxName=name; mode='fx'; fxT=0; renderFx(); persist();
+  tickFn = dt => { fxT += dt*(.2+S.speed/25); out(FX[name].f(fxT)); };
+}
+$('speed').oninput = e => { S.speed=+e.target.value; $('speedVal').textContent=S.speed; persist(); };
+$('stopFx').onclick = () => { stopAll(); applyColor(); };
 
-// ===== Timer =====
-function cancelTimer(){ clearTimeout(timerHandle); clearInterval(timerTick); timerHandle=null; $('timerTxt').textContent=''; }
-document.querySelectorAll('[data-timer]').forEach(b => b.onclick = () => {
-  cancelTimer();
-  const ms = +b.dataset.timer*60000; timerEnd = Date.now()+ms;
-  timerHandle = setTimeout(async () => { stopFx(); stopMic(); await write(CMD_OFF); cancelTimer(); }, ms);
-  timerTick = setInterval(() => { const m = Math.ceil((timerEnd-Date.now())/60000); $('timerTxt').textContent = `Strip gaat uit over ${m} min (houd dit tabblad open).`; }, 1000);
-  $('timerTxt').textContent = `Strip gaat uit over ${b.dataset.timer} min (houd dit tabblad open).`;
+function renderMix(){
+  const box=$('mix'); box.innerHTML='';
+  S.mix.forEach((c,i) => {
+    const inp=document.createElement('input'); inp.type='color'; inp.value=c; inp.setAttribute('aria-label','Mixkleur '+(i+1));
+    inp.oninput=()=>{ S.mix[i]=inp.value; persist(); };
+    inp.onchange=()=>{ renderFx(); };
+    inp.addEventListener('contextmenu',ev=>{ev.preventDefault();});
+    let pressT; inp.addEventListener('pointerdown',()=>{ pressT=setTimeout(()=>{ if(S.mix.length>2){ S.mix.splice(i,1); persist(); renderMix(); renderFx(); toast('Kleur verwijderd'); } },700); });
+    ['pointerup','pointerleave','pointercancel'].forEach(t=>inp.addEventListener(t,()=>clearTimeout(pressT)));
+    box.appendChild(inp);
+  });
+  if (S.mix.length<6){ const add=document.createElement('button'); add.className='mini'; add.textContent='+'; add.setAttribute('aria-label','Kleur toevoegen');
+    add.onclick=()=>{ S.mix.push(rgbToHex(...Object.values(hsv(Math.random()*360,1,1)))); persist(); renderMix(); renderFx(); }; box.appendChild(add); }
+}
+
+// ===== Muziek =====
+let micCtx=null, micStream=null, analyser=null, micData=null, micSmooth=0, micAvg=0, micHue=0, lastBeat=0;
+const meter=$('meter'); for(let i=0;i<24;i++) meter.appendChild(document.createElement('i'));
+const MIC_HINTS = { pulse:'Je gekozen kleur pulseert op de bas.', beat:'De kleur springt op elke beat, de bas bepaalt de helderheid.', spectrum:'Bas wordt rood, midden groen en hoog blauw.' };
+function renderMic(){
+  document.querySelectorAll('#micMode button').forEach(b=>b.classList.toggle('on', b.dataset.m===S.micMode));
+  $('micHint').textContent = MIC_HINTS[S.micMode];
+  $('btnMic').textContent = mode==='music' ? 'Stop muziekmodus' : 'Start muziekmodus';
+  $('btnMic').classList.toggle('ghost', mode==='music');
+}
+document.querySelectorAll('#micMode button').forEach(b => b.onclick = () => { S.micMode=b.dataset.m; persist(); renderMic(); });
+$('sens').oninput = e => { S.sens=+e.target.value; $('sensVal').textContent=S.sens; persist(); };
+
+async function startMic(){
+  if (!characteristic) { toast('Verbind eerst met de strip'); return; }
+  if (!navigator.mediaDevices) { toast('Microfoon niet beschikbaar in deze browser'); return; }
+  stopMic(true); tickFn=null; fxName=null; renderFx();
+  try { micStream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}}); }
+  catch(e){ toast('Microfoon geweigerd. Sta hem toe in de browserinstellingen'); mode='static'; renderMic(); return; }
+  micCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if (micCtx.state==='suspended') await micCtx.resume();
+  const src = micCtx.createMediaStreamSource(micStream);
+  analyser = micCtx.createAnalyser(); analyser.fftSize=512; analyser.smoothingTimeConstant=.55; src.connect(analyser);
+  micData = new Uint8Array(analyser.frequencyBinCount);
+  mode='music'; powered=true; updatePower(); renderMic();
+  tickFn = () => {
+    analyser.getByteFrequencyData(micData);
+    const avgBins=(a,b)=>{ let s=0; for(let i=a;i<=b;i++) s+=micData[i]; return s/((b-a+1)*255); };
+    const gain = .5 + S.sens/40;
+    const bass=Math.min(1,avgBins(1,3)*gain), mid=Math.min(1,avgBins(4,30)*gain*1.6), tre=Math.min(1,avgBins(31,110)*gain*3.2);
+    micAvg = micAvg*.96 + bass*.04;
+    const now=performance.now();
+    if (bass > micAvg*1.35+.08 && now-lastBeat>180){ micHue=(micHue+55)%360; lastBeat=now; }
+    micSmooth = Math.max(bass, micSmooth*.85);
+    const bars=meter.children;
+    for(let i=0;i<bars.length;i++){ const v = micData[Math.floor(i*i/ bars.length*1.6)+1]/255; bars[i].style.height=(4+v*42)+'px'; }
+    if (S.micMode==='pulse')    out(S.base, Math.pow(micSmooth,1.2));
+    else if (S.micMode==='beat') out(hsv(micHue,1,1), Math.pow(micSmooth,1.2));
+    else out({r:bass*255,g:mid*255,b:tre*255}, 1);
+  };
+}
+function stopMic(silent){
+  if (micStream) micStream.getTracks().forEach(t=>t.stop()); micStream=null;
+  if (micCtx) micCtx.close(); micCtx=null; analyser=null;
+  for (const b of meter.children) b.style.height='4px';
+  if (!silent){ tickFn=null; mode='static'; }
+  renderMic();
+}
+$('btnMic').onclick = () => { if (mode==='music'){ stopAll(); applyColor(); } else { startMic(); } };
+
+// ===== Tijd: slaapfade en zonsopgang =====
+function chipSet(boxId, mins, onPick){
+  const box=$(boxId); mins.forEach(m => { const b=document.createElement('button'); b.textContent=m+' min'; b.onclick=()=>onPick(m); box.appendChild(b); });
+}
+function sleepUI(){
+  $('sleepCancel').style.display = sleep ? 'block' : 'none';
+  $('sleepTxt').textContent = sleep ? 'De strip dimt en gaat uit na de slaapfade. Houd deze pagina open.' : '';
+  document.querySelectorAll('#sleepChips button').forEach(b=>b.classList.toggle('on', !!sleep && b.dataset.m==sleep.min));
+}
+chipSet('sleepChips',[5,10,20,30,60], m => {
+  if (!characteristic){ toast('Verbind eerst met de strip'); return; }
+  if (!powered){ powered=true; write(CMD_ON); updatePower(); enterMode(); }
+  sleep={start:Date.now(), dur:m*60000, min:m}; sleepUI(); toast('Slaapfade gestart: '+m+' minuten');
 });
-$('btnTimerCancel').onclick = cancelTimer;
+document.querySelectorAll('#sleepChips button').forEach((b,i)=>b.dataset.m=[5,10,20,30,60][i]);
+$('sleepCancel').onclick = () => { sleep=null; sleepUI(); if (mode==='static') applyColor(); };
+async function finishSleep(){ sleep=null; powered=false; stopAll(); await write(CMD_OFF); updatePower(); sleepUI(); }
+
+const SUN = [[0,[18,0,0]],[.3,[255,25,0]],[.62,[255,105,18]],[1,[255,190,110]]];
+function sunColor(p){
+  for (let i=1;i<SUN.length;i++){ if (p<=SUN[i][0]){ const [p0,c0]=SUN[i-1],[p1,c1]=SUN[i]; const t=(p-p0)/(p1-p0);
+    return {r:lerp(c0[0],c1[0],t), g:lerp(c0[1],c1[1],t), b:lerp(c0[2],c1[2],t)}; } }
+  const l=SUN[SUN.length-1][1]; return {r:l[0],g:l[1],b:l[2]};
+}
+chipSet('sunChips',[5,10,15,30], m => {
+  if (!characteristic){ toast('Verbind eerst met de strip'); return; }
+  sleep=null; sleepUI(); stopMic(true); fxName=null; renderFx();
+  powered=true; updatePower(); write(CMD_ON); mode='sunrise'; const start=Date.now(), dur=m*60000;
+  tickFn = () => { const p=Math.min(1,(Date.now()-start)/dur); const c=sunColor(p); out(c, Math.max(.04,Math.pow(p,.7)), false);
+    if (p>=1){ S.base={r:255,g:190,b:110}; S.bri=100; $('bri').value=100; $('briVal').textContent='100%'; placeKnob(); stopAll(); applyColor(); toast('Goedemorgen'); } };
+  toast('Zonsopgang gestart: '+m+' minuten');
+});
+
+// Scherm aan houden
+let wakeLock=null;
+async function setWake(on){
+  try {
+    if (on){ if(!navigator.wakeLock){ toast('Wordt niet ondersteund in deze browser'); $('wake').checked=false; return; }
+      wakeLock = await navigator.wakeLock.request('screen'); }
+    else if (wakeLock){ await wakeLock.release(); wakeLock=null; }
+  } catch(e){ $('wake').checked=false; toast('Kon scherm niet aan houden'); }
+}
+$('wake').onchange = e => setWake(e.target.checked);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState==='visible' && $('wake').checked) setWake(true); });
+
+// ===== Scènes =====
+function renderScenes(){
+  const box=$('sceneList'); box.innerHTML='';
+  $('sceneEmpty').style.display = S.scenes.length ? 'none' : 'block';
+  S.scenes.forEach((sc,i) => {
+    const row=document.createElement('div'); row.className='row'; row.style.cursor='default';
+    const g = sc.mode==='fx' ? (typeof FX[sc.fx].grad==='function'?FX[sc.fx].grad():FX[sc.fx].grad) : (sc.mode==='music' ? 'linear-gradient(90deg,#f33,#3d6,#36f)' : rgbToHex(sc.base.r,sc.base.g,sc.base.b));
+    const label = sc.mode==='fx' ? 'Effect: '+sc.fx : sc.mode==='music' ? 'Muziek: '+sc.micMode : 'Vaste kleur, '+sc.bri+'%';
+    const go=document.createElement('button'); go.className='row'; go.style.cssText='border:0;padding:0;flex:1';
+    go.innerHTML='<span class="chip" style="background:'+g+'"></span><span class="name">'+sc.name.replace(/</g,'&lt;')+'<small>'+label+'</small></span>';
+    go.onclick=()=>applyScene(sc);
+    const del=document.createElement('button'); del.className='x'; del.textContent='✕'; del.setAttribute('aria-label','Verwijder '+sc.name);
+    del.onclick=()=>{ S.scenes.splice(i,1); persist(); renderScenes(); };
+    row.append(go,del); box.appendChild(row);
+  });
+}
+function applyScene(sc){
+  if (!characteristic){ toast('Verbind eerst met de strip'); return; }
+  S.base=sc.base; S.bri=sc.bri; S.speed=sc.speed; S.micMode=sc.micMode; if(sc.mix) S.mix=sc.mix.slice();
+  $('bri').value=S.bri; $('briVal').textContent=S.bri+'%'; $('speed').value=S.speed; $('speedVal').textContent=S.speed;
+  placeKnob(); renderMix(); renderMic(); sleep=null; sleepUI();
+  powered=true; updatePower(); write(CMD_ON);
+  if (sc.mode==='fx'){ mode='fx'; startFx(sc.fx); } else if (sc.mode==='music'){ mode='music'; startMic(); } else { stopAll(); applyColor(); }
+  persist(); toast('Scène: '+sc.name);
+}
+$('saveScene').onclick = () => {
+  const name = $('sceneName').value.trim() || 'Scène '+(S.scenes.length+1);
+  S.scenes.push({ name, mode: (mode==='fx'||mode==='music') ? mode : 'static', base:S.base, bri:S.bri, fx:S.fx, speed:S.speed, mix:S.mix.slice(), micMode:S.micMode });
+  $('sceneName').value=''; persist(); renderScenes(); toast('Scène bewaard');
+};
+
+// ===== Tabs =====
+document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on', x===b));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('show', p.id==='p-'+b.dataset.tab));
+  window.scrollTo({top:0});
+});
+
+// ===== Start =====
+$('bri').value=S.bri; $('briVal').textContent=S.bri+'%'; $('speed').value=S.speed; $('speedVal').textContent=S.speed; $('sens').value=S.sens; $('sensVal').textContent=S.sens;
+placeKnob(); renderFx(); renderMix(); renderMic(); renderScenes(); sleepUI();
+paint(S.base.r,S.base.g,S.base.b);
 </script>
 </body>
 </html>
